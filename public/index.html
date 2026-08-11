@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicole · REEL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --black: #0A0A0A;
+            --dark: #111111;
+            --card: #161616;
+            --border: #222;
+            --text: #E8E4DF;
+            --dim: #777;
+            --accent: #C8A45C;
+            --accent2: #D4AF37;
+            --warm: #F5E6D0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: "Noto Sans SC", sans-serif;
+            background: var(--black);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ===== Noise Overlay ===== */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 6vw 10vh;
+            position: relative;
+            background: linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.95) 85%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(200,164,92,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(200,164,92,0.04) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .hero-top {
+            position: absolute;
+            top: 40px;
+            left: 6vw;
+            right: 6vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero-top .logo {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1.1em;
+            letter-spacing: 4px;
+            color: var(--accent);
+        }
+        .hero-top .nav {
+            display: flex;
+            gap: 32px;
+        }
+        .hero-top .nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .hero-top .nav a:hover { color: var(--accent); }
+
+        .hero-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: clamp(4em, 12vw, 10em);
+            line-height: 0.9;
+            letter-spacing: -2px;
+            color: var(--warm);
+        }
+        .hero-title span {
+            display: block;
+            font-family: "Playfair Display", serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.35em;
+            letter-spacing: 4px;
+            color: var(--accent);
+            margin-top: 16px;
+        }
+        .hero-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        .hero-bottom .desc {
+            font-size: 0.85em;
+            color: var(--dim);
+            max-width: 360px;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+        .hero-bottom .scroll-hint {
+            font-size: 0.7em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--dim);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ===== Section Header ===== */
+        .section-header {
+            padding: 80px 6vw 40px;
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+        .section-header .num {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 1em;
+            color: var(--accent);
+            letter-spacing: 2px;
+        }
+        .section-header h2 {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: clamp(1.6em, 4vw, 2.4em);
+            letter-spacing: 3px;
+            color: var(--warm);
+        }
+        .section-header .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin-left: 16px;
+        }
+
+        /* ===== Video Grid ===== */
+        .reel-grid {
+            padding: 0 6vw 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .reel-card {
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--card);
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+        }
+        .reel-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .reel-card video {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 440px;
+            object-fit: cover;
+            display: block;
+            filter: brightness(0.9) contrast(1.05);
+            transition: filter 0.4s;
+        }
+        .reel-card:hover video {
+            filter: brightness(1) contrast(1.1);
+        }
+        .reel-card .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 52px;
+            height: 52px;
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.3);
+        }
+        .reel-card:hover .play-btn {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .reel-card .play-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #fff;
+            margin-left: 3px;
+        }
+
+        /* Full-width feature card */
+        .reel-card.feature {
+            grid-column: span 2;
+        }
+        .reel-card.feature video {
+            aspect-ratio: 16/9;
+            max-height: 360px;
+        }
+
+        /* ===== About ===== */
+        .about-section {
+            padding: 80px 6vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+        .about-left .label {
+            font-size: 0.7em;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        .about-left h2 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(2em, 4vw, 3.2em);
+            color: var(--warm);
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .about-left p {
+            font-size: 0.9em;
+            color: var(--dim);
+            line-height: 2;
+            font-weight: 300;
+        }
+        .about-right {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .stat-card {
+            padding: 28px 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        .stat-card .num {
+            font-family: "Bebas Neue", sans-serif;
+            font-size: 2.4em;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .stat-card .text {
+            font-size: 0.78em;
+            color: var(--dim);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== Contact ===== */
+        .contact-section {
+            padding: 100px 6vw;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(var(--accent), transparent);
+        }
+        .contact-section .label {
+            font-size: 0.7em;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .contact-section h2 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(2em, 5vw, 3.6em);
+            color: var(--warm);
+            margin-bottom: 16px;
+        }
+        .contact-section .sub {
+            font-size: 0.9em;
+            color: var(--dim);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        .wechat-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 40px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 1em;
+            letter-spacing: 2px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: "Noto Sans SC", sans-serif;
+        }
+        .wechat-btn:hover {
+            background: var(--accent);
+            color: var(--black);
+        }
+        .wechat-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        .copy-hint {
+            margin-top: 16px;
+            font-size: 0.75em;
+            color: var(--dim);
+            letter-spacing: 1px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 32px 6vw;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            font-size: 0.7em;
+            color: #444;
+            letter-spacing: 2px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--accent);
+            color: var(--black);
+            padding: 12px 32px;
+            border-radius: 2px;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { padding: 0 6vw 8vh; }
+            .hero-top .nav { display: none; }
+            .reel-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .reel-card.feature { grid-column: span 2; }
+            .reel-card video { max-height: 280px; }
+            .about-section { grid-template-columns: 1fr; gap: 40px; }
+            .about-right { grid-template-columns: 1fr 1fr; }
+            .contact-section { padding: 60px 6vw; }
+        }
+        @media (max-width: 480px) {
+            .reel-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .reel-card video { max-height: 240px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-top">
+        <div class="logo">NICOLE REEL</div>
+        <nav class="nav">
+            <a href="#ai-works">AI作品</a>
+            <a href="#works">作品</a>
+            <a href="#about">关于</a>
+            <a href="#contact">联系</a>
+        </nav>
+    </div>
+    <h1 class="hero-title">
+        NICOLE
+        <span>Director &nbsp;/ &nbsp;Storyteller &nbsp;/ &nbsp;Creator</span>
+    </h1>
+    <div class="hero-bottom">
+        <p class="desc">
+            十年影像叙事经验，从品牌广告到剧情短片，<br>
+            用镜头语言讲述打动人心的故事。
+        </p>
+        <div class="scroll-hint">↓ &nbsp; SCROLL TO EXPLORE</div>
+    </div>
+</section>
+
+<!-- ===== WORKS: AI GENERATED ===== -->
+<div id="ai-works">
+    <div class="section-header fade-in">
+        <span class="num">01</span>
+        <h2>AI GENERATED</h2>
+        <span class="line"></span>
+    </div>
+    <div class="reel-grid">
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_yangpian.jpg">
+                <source src="/videos/video_15.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_heise.jpg">
+                <source src="/videos/video_21.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_jianlibao.jpg">
+                <source src="/videos/video_09.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_gaiBGM.jpg">
+                <source src="/videos/video_14.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_1min_story.jpg">
+                <source src="/videos/video_03.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_2.jpg">
+                <source src="/videos/video_04.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_6yue29.jpg">
+                <source src="/videos/video_06.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_7yue16.jpg">
+                <source src="/videos/video_07.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_dali.jpg">
+                <source src="/videos/video_12.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_website.jpg">
+                <source src="/videos/video_16.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_new.jpg">
+                <source src="/videos/video_22.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== WORKS: NARRATIVE FILMS ===== -->
+<div id="works">
+    <div class="section-header fade-in">
+        <span class="num">02</span>
+        <h2>NARRATIVE FILMS</h2>
+        <span class="line"></span>
+    </div>
+    <div class="reel-grid">
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_2021_zhiminghuo.jpg">
+                <source src="/videos/video_05.MP4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_laobanniang.jpg">
+                <source src="/videos/video_17.mov" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== WORKS: COMMERCIAL ===== -->
+<div>
+    <div class="section-header fade-in">
+        <span class="num">03</span>
+        <h2>COMMERCIAL</h2>
+        <span class="line"></span>
+    </div>
+    <div class="reel-grid">
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_aking.jpg">
+                <source src="/videos/video_20.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== WORKS: CREATIVE ===== -->
+<div>
+    <div class="section-header fade-in">
+        <span class="num">04</span>
+        <h2>CREATIVE</h2>
+        <span class="line"></span>
+    </div>
+    <div class="reel-grid">
+    </div>
+</div>
+
+<!-- ===== WORKS: DOCUMENTARY ===== -->
+<div>
+    <div class="section-header fade-in">
+        <span class="num">05</span>
+        <h2>DOCUMENTARY</h2>
+        <span class="line"></span>
+    </div>
+    <div class="reel-grid">
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_qinggan.jpg">
+                <source src="/videos/video_13.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_jiaqi.jpg">
+                <source src="/videos/video_11.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_xiyan.jpg">
+                <source src="/videos/video_10.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="reel-card fade-in">
+            <video controls preload="none" muted playsinline poster="/videos/poster_23.jpg">
+                <source src="/videos/video_23.mp4" type="video/mp4">
+            </video>
+            <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="about-section fade-in">
+    <div class="about-left">
+        <div class="label">ABOUT</div>
+        <h2>Ten years behind<br>the lens.</h2>
+        <p>
+            深耕短视频与影像创作十年，覆盖剧情短片、品牌广告、人物纪实等多种类型。
+            从创意构思到成片交付，擅长用镜头语言构建有温度、有张力的视觉叙事。
+            现聚焦 AI 赋能内容创作，探索技术驱动下的影像新可能。
+        </p>
+    </div>
+    <div class="about-right">
+        <div class="stat-card">
+            <div class="num">10+</div>
+            <div class="text">YEARS EXPERIENCE</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">19</div>
+            <div class="text">SELECTED WORKS</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">4</div>
+            <div class="text">CATEGORIES</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">∞</div>
+            <div class="text">STORIES TO TELL</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact" class="contact-section fade-in">
+    <div class="label">GET IN TOUCH</div>
+    <h2>Let's create<br>something together.</h2>
+    <p class="sub">合作洽谈 · 视频定制 · 内容策划</p>
+    <button class="wechat-btn" onclick="copyWechat()">
+        <svg viewBox="0 0 24 24"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.142 2.361-.372a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.045c.133 0 .241-.108.241-.245 0-.06-.023-.119-.039-.177l-.326-1.233a.49.49 0 01.177-.554C23.026 18.514 24 16.807 24 14.864c0-3.37-3.165-6.07-7.062-6.006zm-2.095 3.126c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.969-.982z"/></svg>
+        微信：m515600096
+    </button>
+    <p class="copy-hint">点击复制微信号</p>
+</section>
+
+<footer>© 2026 NICOLE &nbsp;·&nbsp; ALL RIGHTS RESERVED</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">微信号已复制</div>
+
+<script>
+// Copy WeChat
+function copyWechat() {
+    navigator.clipboard.writeText('m515600096').then(() => {
+        const t = document.getElementById('toast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    });
+}
+
+// Scroll fade-in
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Smooth scroll for nav
+document.querySelectorAll('.hero-top .nav a').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+</script>
+
+</body>
+</html>
